@@ -1,3 +1,5 @@
 /.env
 /mysql
 app/node_modules
+app/dist
+app/jet-logger.log
