@@ -3,3 +3,4 @@
 app/node_modules
 app/dist
 app/jet-logger.log
+app/src/pre-start/env/production.env
