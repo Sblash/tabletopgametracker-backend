@@ -12,13 +12,21 @@ const { CREATED, OK } = StatusCodes;
 
 // Paths
 export const p = {
-    get: '/all',
-    add: '/add',
-    update: '/update',
-    delete: '/delete/:id',
+    get: '/',
+    // add: '/add',
+    // update: '/update',
+    // delete: '/delete/:id',
 } as const;
 
 
+router.use((req, res, next) => {
+    console.log(req.cookies.phpMyAdmin)
+    if (req.cookies.phpMyAdmin) {
+
+    }
+
+    res.status(400).send('Not logged in.')
+})
 
 /**
  * Get all users.
@@ -32,16 +40,16 @@ router.get(p.get, async (_: Request, res: Response) => {
 /**
  * Add one user.
  */
-router.post(p.add, async (req: Request, res: Response) => {
-    const { user } = req.body;
-    // Check param
-    if (!user) {
-        throw new ParamMissingError();
-    }
-    // Fetch data
-    await userService.addOne(user);
-    return res.status(CREATED).end();
-});
+// router.post(p.add, async (req: Request, res: Response) => {
+//     const { user } = req.body;
+//     // Check param
+//     if (!user) {
+//         throw new ParamMissingError();
+//     }
+//     // Fetch data
+//     await userService.addOne(user);
+//     return res.status(CREATED).end();
+// });
 
 
 /**
