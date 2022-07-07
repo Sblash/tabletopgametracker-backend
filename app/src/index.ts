@@ -1,7 +1,7 @@
 import './pre-start'; // Must be the first import
 import logger from 'jet-logger';
 import server from './server';
-import User from './models/user';
+import { db as sequelize } from "./repos/orm"
 
 
 // Constants
@@ -11,6 +11,6 @@ const serverStartMsg = 'Express server started on port: ',
 // Start server
 server.listen(port, async () => {
     logger.info("Syncing database...");
-    await User.sync()
+    await sequelize.sync({alter: true})
     logger.info(serverStartMsg + port);
 });

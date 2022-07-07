@@ -1,32 +1,33 @@
-import { DataTypes } from "sequelize";
-import db from "../repos/orm"
+import { DataType, Model, Table, Column, CreatedAt, UpdatedAt } from "sequelize-typescript";
 
-const User = db.define('user', {
-  // Model attributes are defined here
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-    allowNull: false
-  },
-  username: {
-    type: DataTypes.STRING,
+@Table({
+  tableName: "user",
+  timestamps: true,
+})
+export class User extends Model {
+  @Column({
+    type: DataType.STRING,
     allowNull: true
-  },
-  telegram_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
-  created_at: {
-    type: DataTypes.DATE,
-    allowNull: true
-  },
-  updated_at: {
-    type: DataTypes.DATE,
-    allowNull: true
-  }
-}, {
-  // Other model options go here
-});
+  })
+  username!: string
 
-export default User
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: true
+  })
+  telegram_id!: string
+
+  @CreatedAt
+  @Column({
+    type: DataType.DATE,
+    allowNull: true
+  })
+  created_at!: Date;
+
+  @UpdatedAt
+  @Column({
+    type: DataType.DATE,
+    allowNull: true
+  })
+  updated_at!: Date;
+}
