@@ -1,4 +1,7 @@
-import { DataType, Model, Table, Column, CreatedAt, UpdatedAt } from "sequelize-typescript";
+import { DataType, Model, Table, Column, CreatedAt, UpdatedAt, ForeignKey, HasMany } from "sequelize-typescript";
+import { Group } from "./group";
+import { Page } from "./page";
+import { Log } from "./log";
 
 @Table({
   tableName: "game",
@@ -22,6 +25,19 @@ export class Game extends Model {
     allowNull: true
   })
   profile_pic!: string
+
+  @ForeignKey(() => Group)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false
+  })
+  group_id!: number
+
+  @HasMany(() => Page)
+  pages!: Page[]
+
+  @HasMany(() => Log)
+  logs!: Log[]
 
   @CreatedAt
   @Column({

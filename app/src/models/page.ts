@@ -1,15 +1,13 @@
-import { DataType, Model, Table, Column, CreatedAt, UpdatedAt, ForeignKey, BelongsToMany, HasMany } from "sequelize-typescript";
-import { User } from "./user";
-import { UserGroup } from "./user-group";
+import { DataType, Model, Table, Column, CreatedAt, UpdatedAt, ForeignKey, HasMany } from "sequelize-typescript";
 import { Game } from "./game";
+import { Element } from "./element";
 import { Log } from "./log";
 
-
 @Table({
-    tableName: "group",
-    timestamps: true,
-  })
-export class Group extends Model {
+    tableName: "page",
+    timestamps: true
+})
+export class Page extends Model {
     @Column({
         type: DataType.STRING,
         allowNull: false
@@ -22,18 +20,21 @@ export class Group extends Model {
     })
     slug!: string
 
-    @ForeignKey(() => User)
+    @Column({
+        type: DataType.JSON,
+        allowNull: true
+    })
+    structure!: JSON
+
+    @ForeignKey(() => Game)
     @Column({
         type: DataType.INTEGER,
-        allowNull: false
+        allowNull: true
     })
-    created_by!: number
+    game_id!: number
 
-    @BelongsToMany(() => User, () => UserGroup)
-    users!: User[]
-
-    @HasMany(() => Game)
-    games!: Game[]
+    @HasMany(() => Element)
+    elements!: Element[]
 
     @HasMany(() => Log)
     logs!: Log[]

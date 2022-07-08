@@ -1,4 +1,7 @@
-import { DataType, Model, Table, Column, CreatedAt, UpdatedAt } from "sequelize-typescript";
+import { DataType, Model, Table, Column, CreatedAt, UpdatedAt, HasMany, BelongsToMany } from "sequelize-typescript";
+import { Group } from "./group";
+import { UserGroup } from "./user-group";
+import { Log } from "./log";
 
 @Table({
   tableName: "user",
@@ -16,6 +19,15 @@ export class User extends Model {
     allowNull: true
   })
   telegram_id!: string
+
+  @HasMany(() => Group)
+  groups_created!: Group[]
+
+  @BelongsToMany(() => Group, () => UserGroup)
+  groups!: Group[]
+
+  @HasMany(() => Log)
+  logs!: Log[]
 
   @CreatedAt
   @Column({
