@@ -39,7 +39,7 @@ authRouter.post(p.login, async (_: Request, res: Response) => {
     }
 
     let token: string = jwt.sign(userObject, process.env.JWT_ACCESS_KEY, { expiresIn: 900})
-    let refresh_token: string = jwt.sign(userObject, process.env.JWT_REFRESH_KEY, { expiresIn: 86400})
+    let refresh_token: string = jwt.sign(userObject, process.env.JWT_REFRESH_KEY, { expiresIn: 8640000})
 
     res.status(OK).json({
         "access_token": token,
