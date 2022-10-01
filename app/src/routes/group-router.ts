@@ -1,6 +1,6 @@
 import StatusCodes from 'http-status-codes';
 import { Request, Response, Router } from 'express';
-import { createGroup, updateGroup } from "../services/group-service";
+import { createGroup, updateGroup, getGroups } from "../services/group-service";
 import { getGroupById } from "../repos/group-repo";
 import { Group } from '../models/group';
 
@@ -18,8 +18,8 @@ const p = {
 
 //Get list groups
 groupRouter.get(p.list, async (_: Request, res: Response) => {
-    // const users = await userService.addOne();
-    // return res.status(OK).json({users});
+    const groups = await getGroups();
+    return res.status(OK).json({groups});
 });
 
 //Create group

@@ -20,6 +20,10 @@ export function updateGroup(group: Group, name: string) {
     return group;
 }
 
+export function getGroups() {
+    return Group.findAll();
+}
+
 function getSlug(value: string) {
     let slug = value.toLowerCase().trim();
     slug = slug.replace("/ /gi", "_");
