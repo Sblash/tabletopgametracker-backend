@@ -24,6 +24,14 @@ export function getGroups() {
     return Group.findAll();
 }
 
+export function deleteGroup(group_id: number) {
+    return Group.destroy({
+        where: {
+            id: group_id
+        }
+    });
+}
+
 function getSlug(value: string) {
     let slug = value.toLowerCase().trim();
     slug = slug.replace("/ /gi", "_");
