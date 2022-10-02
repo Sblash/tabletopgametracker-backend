@@ -13,6 +13,4 @@ Think to games like Gloomhaven or D&D, you have to write down a lot of things on
 Run the command:
 ```
 docker-compose up -d
-docker-compose exec backend bash
-npm install
 ```
