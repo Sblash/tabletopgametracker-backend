@@ -1,4 +1,4 @@
-import { User } from '@models/user';
+import { User } from '../models/user';
 import { UserNotFoundError } from '@shared/errors';
 
 export function createUser(username: string, telegram_id: number) {
