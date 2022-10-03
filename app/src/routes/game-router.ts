@@ -16,33 +16,52 @@ const p = {
     delete: "/delete"
 };
 
-//Get list groups
+//Get list games
 gameRouter.get(p.list, async (_: Request, res: Response) => {
-    const groups = await getGames();
-    return res.status(OK).json({groups});
+    const games = await getGames();
+    return res.status(OK).json({ success:true, games: games});
 });
 
-//Create group
+//Create game
 gameRouter.post(p.create, async (_: Request, res: Response) => {
     const name: string = _.body.name;
     const group_id: number = _.body.group_id;
-    const group = await createGame(name, group_id);
-    return res.status(CREATED).json({ group })
+    const game = await createGame(name, group_id);
+    return res.status(CREATED).json({ success: true, game: game })
 });
 
-//Update group
+//Update game
 gameRouter.put(p.update, async (_: Request, res: Response) => {
     let name: string = _.body.name;
-    let group_id: number = _.body.group_id;
+    let game_id: number = _.body.game_id;
 
-    let group: Game | null = await getGameById(group_id);
+    let game: Game | null = await getGameById(game_id);
 
-    if (!group) {
+    if (!game) {
         return res.status(BAD_REQUEST).json({
-            "message": "group not found."
+            "message": "game not found."
         })
     }
 
-    group = await updateGame(group, name);
-    return res.status(OK).json({ group })
+    game = await updateGame(game, name);
+    return res.status(OK).json({ success: true, game: game })
+});
+
+//Delete game
+gameRouter.delete(p.delete, async (_: Request, res: Response) => {
+    const game_id: number = _.body.game_id;
+
+    try {
+        if (!game_id) return res.status(OK).json({ success: false, message: "game_id can't be null." });
+        const result = await deleteGame(game_id);
+        
+        if (result) {
+            return res.status(OK).json({ success: true, message: "Game deleted." });
+        } else {
+            return res.status(OK).json({ success: false, message: "Game not found." });
+        }
+        
+    } catch(e) {
+        return res.status(OK).json({ success: false, message: e });
+    }
 });
