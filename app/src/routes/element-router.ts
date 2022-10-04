@@ -35,11 +35,11 @@ elementRouter.put(p.update, async (_: Request, res: Response) => {
     let name: string = _.body.name;
     let element_id: number = _.body.element_id;
 
-    let element: Page | null = await getElementById(element_id);
+    let element: Element | null = await getElementById(element_id);
 
     if (!element) {
         return res.status(BAD_REQUEST).json({
-            "message": "page not found."
+            "message": "element not found."
         })
     }
 
