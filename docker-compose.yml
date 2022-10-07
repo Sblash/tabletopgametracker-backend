@@ -28,6 +28,6 @@ services:
     image: phpmyadmin:latest
     restart: always
     ports:
-      - 8081:80
+      - 3004:80
     links:
       - db
