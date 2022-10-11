@@ -12,10 +12,10 @@ const baseRouter = Router();
 // Setup routers
 baseRouter.use('/user', userRouter);
 baseRouter.use('/auth', authRouter);
-baseRouter.use('/group', groupRouter);
-baseRouter.use('/game', gameRouter);
-baseRouter.use('/page', pageRouter);
-baseRouter.use('/element', elementRouter);
+baseRouter.use('/groups', groupRouter);
+baseRouter.use('/games', gameRouter);
+baseRouter.use('/pages', pageRouter);
+baseRouter.use('/elements', elementRouter);
 
 // Export default.
 export default baseRouter;

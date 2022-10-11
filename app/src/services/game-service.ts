@@ -1,4 +1,5 @@
 import { Game } from "../models/game";
+import { Group } from "../models/group";
 
 export function createGame(name: string, group_id: number) {
     let slug: string = getSlug(name);
@@ -20,8 +21,8 @@ export function updateGame(game: Game, name: string) {
     return game;
 }
 
-export function getGames() {
-    return Game.findAll();
+export function getGamesByGroup(group: Group) {
+    return group.games;
 }
 
 export function deleteGame(group_id: number) {

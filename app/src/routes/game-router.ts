@@ -1,6 +1,7 @@
 import StatusCodes from 'http-status-codes';
 import { Request, Response, Router } from 'express';
-import { createGame, updateGame, getGames, deleteGame } from "../services/game-service";
+import { createGame, updateGame, getGamesByGroup, deleteGame } from "../services/game-service";
+import { getGroupBySlug } from "../services/group-service";
 import { getGameById } from "../repos/game-repo";
 import { Game } from '../models/game';
 
@@ -10,7 +11,7 @@ const { CREATED, OK, BAD_REQUEST } = StatusCodes;
 
 // Paths
 const p = {
-    list: '/',
+    list: '/:group_slug',
     create: "/create",
     update: "/update",
     delete: "/delete"
@@ -18,7 +19,13 @@ const p = {
 
 //Get list games
 gameRouter.get(p.list, async (_: Request, res: Response) => {
-    const games = await getGames();
+    const group_slug = _.params.group_slug;
+    const group = await getGroupBySlug(group_slug);
+
+    if (!group) return res.status(OK).json({ success:false, message: "The group doesn't exists."});
+
+    const games = await getGamesByGroup(group);
+    
     return res.status(OK).json({ success:true, games: games});
 });
 

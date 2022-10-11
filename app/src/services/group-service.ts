@@ -24,6 +24,14 @@ export function getGroups() {
     return Group.findAll();
 }
 
+export function getGroupBySlug(slug: string) {
+    return Group.findOne({
+        where: {
+            slug: slug
+        }
+    });
+}
+
 export function deleteGroup(group_id: number) {
     return Group.destroy({
         where: {
