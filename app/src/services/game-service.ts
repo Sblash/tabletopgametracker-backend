@@ -21,10 +21,6 @@ export function updateGame(game: Game, name: string) {
     return game;
 }
 
-export function getGamesByGroup(group: Group) {
-    return group.games;
-}
-
 export function deleteGame(group_id: number) {
     return Game.destroy({
         where: {

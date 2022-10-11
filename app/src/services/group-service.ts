@@ -1,3 +1,4 @@
+import { Game } from "@models/game";
 import { Group } from "../models/group";
 
 export function createGroup(name: string, created_by: number) {
@@ -28,7 +29,8 @@ export function getGroupBySlug(slug: string) {
     return Group.findOne({
         where: {
             slug: slug
-        }
+        },
+        include: Game
     });
 }
 
