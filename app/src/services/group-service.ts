@@ -1,4 +1,4 @@
-import { Game } from "@models/game";
+import { Game } from "../models/game";
 import { Group } from "../models/group";
 
 export function createGroup(name: string, created_by: number) {
