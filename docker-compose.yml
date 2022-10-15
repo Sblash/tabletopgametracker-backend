@@ -4,7 +4,7 @@ services:
   backend:
     image: node:latest
     tty: true
-    restart: always
+    restart: on-failure:5
     working_dir: /home/tabletoptracker-backend/app
     command: bash -c "npm install && npm run build && npm start"
     ports:
@@ -17,7 +17,7 @@ services:
 
   db:
     image: mysql:latest
-    restart: always
+    restart: on-failure:5
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: tabletoptracker
@@ -26,7 +26,7 @@ services:
   
   phpmyadmin:
     image: phpmyadmin:latest
-    restart: always
+    restart: on-failure:5
     ports:
       - 3004:80
     links:
