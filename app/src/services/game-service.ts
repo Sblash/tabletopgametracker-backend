@@ -1,12 +1,8 @@
 import { Game } from "../models/game";
-import { Group } from "../models/group";
+import { getGroupBySlug } from "./group-service";
 
-export function createGame(name: string, group_slug: string) {
-    const group: any = Group.findOne({
-        where: {
-            slug: group_slug
-        }
-    });
+export async function createGame(name: string, group_slug: string) {
+    const group: any = await getGroupBySlug(group_slug);
 
     let slug: string = getSlug(name);
 
