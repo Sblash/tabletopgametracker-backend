@@ -25,8 +25,8 @@ pageRouter.get(p.list, async (_: Request, res: Response) => {
 //Create page
 pageRouter.post(p.create, async (_: Request, res: Response) => {
     const name: string = _.body.name;
-    const game_id: number = _.body.game_id;
-    const page = await createPage(name, game_id);
+    const game_slug: string = _.body.game_slug;
+    const page = await createPage(name, game_slug);
     return res.status(CREATED).json({ success: true, page: page })
 });
 
