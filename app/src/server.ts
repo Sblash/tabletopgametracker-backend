@@ -41,34 +41,11 @@ if (process.env.NODE_ENV === 'production') {
  **********************************************************************************/
 
 //CORS
- app.use(function (req, res, next) {
+app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Content-Type");
     next();      
   }); 
-
-app.use(function (req, res, next) {
-    let path = req.url;
-
-    if (path === "/auth") next();
-
-    let jwt = require('jsonwebtoken');
-    let authorizationHeader = req.headers.authorization;
-
-    if (!authorizationHeader) return res.status(400).send('Not logged in.');
-
-    let token = authorizationHeader.split(" ")[1];
-    jwt.verify(token, process.env.JWT_ACCESS_KEY, function(err: any, decoded: any) {
-        if (err) {
-            console.log(err)
-            return res.status(401).json({
-                "error": true,
-                "message": 'Unauthorized access.'
-            });
-        }
-        next();
-    })
-});
 
 // Add api router
 app.use('/api', apiRouter);

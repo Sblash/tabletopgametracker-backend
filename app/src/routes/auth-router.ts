@@ -41,7 +41,7 @@ authRouter.post(p.login, async (_: Request, res: Response) => {
     let token: string = jwt.sign(userObject, process.env.JWT_ACCESS_KEY, { expiresIn: 900})
     let refresh_token: string = jwt.sign(userObject, process.env.JWT_REFRESH_KEY, { expiresIn: 8640000})
 
-    res.status(OK).json({
+    return res.status(OK).json({
         "access_token": token,
         "refresh_token": refresh_token
     });   
@@ -54,7 +54,7 @@ authRouter.post(p.login, async (_: Request, res: Response) => {
     let jwt = require('jsonwebtoken');
     let authorization_header = req.headers.authorization;
 
-    if (!authorization_header) return res.status(400).send('Not logged in.');
+    if (!authorization_header) return res.status(400).json({ message: 'Not logged in.' });
 
     let token = authorization_header.split(" ")[1];
     let decoded = jwt.verify(token, process.env.JWT_REFRESH_KEY);
@@ -75,7 +75,7 @@ authRouter.post(p.login, async (_: Request, res: Response) => {
 
     let newToken: string = jwt.sign(userObject, process.env.JWT_ACCESS_KEY, { expiresIn: 900})
 
-    res.status(OK).json({
+    return res.status(OK).json({
         "access_token": newToken
     });
 });
