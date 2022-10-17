@@ -14,25 +14,6 @@ const p = {
     // delete: '/delete/:id',
 } as const;
 
-
-router.use((req, res, next) => {
-    let jwt = require('jsonwebtoken');
-    let authorizationHeader = req.headers.authorization;
-
-    if (!authorizationHeader) return res.status(400).send('Not logged in.');
-
-    let token = authorizationHeader.split(" ")[1];
-    let decoded = jwt.verify(token, process.env.JWT_ACCESS_KEY, function(err: any, decoded: any) {
-        if (err) {
-            return res.status(401).json({
-                "error": true,
-                "message": 'Unauthorized access.'
-            });
-        }
-        next();
-    });
-})
-
 /**
  * Get all users.
  */
