@@ -30,7 +30,7 @@ gameRouter.get(p.list, async (_: Request, res: Response) => {
 //Create game
 gameRouter.post(p.create, async (_: Request, res: Response) => {
     const name: string = _.body.name;
-    const group_slug: number = _.body.group_slug;
+    const group_slug: string = _.body.group_slug;
     const game = await createGame(name, group_slug);
     return res.status(CREATED).json({ success: true, game: game })
 });
