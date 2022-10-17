@@ -1,12 +1,19 @@
+import { Game } from "../models/game";
 import { Page } from "../models/page";
 
-export function createPage(name: string, game_id: number) {
+export function createPage(name: string, game_slug: string) {
+    const game: any = Game.findOne({
+        where: {
+            slug: game_slug
+        }
+    });
+
     let slug: string = getSlug(name);
 
     let page = Page.create({
         name: name,
         slug: slug,
-        game_id: game_id
+        game_id: game.id
     });
 
     return page;
@@ -34,7 +41,7 @@ export function deletePage(page_id: number) {
 
 function getSlug(value: string) {
     let slug = value.toLowerCase().trim();
-    slug = slug.replace("/ /gi", "_");
+    slug = slug.replace(/ /gi, "_");
 
     return slug;
 }

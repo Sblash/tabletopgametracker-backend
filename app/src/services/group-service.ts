@@ -44,7 +44,7 @@ export function deleteGroup(group_id: number) {
 
 function getSlug(value: string) {
     let slug = value.toLowerCase().trim();
-    slug = slug.replace("/ /gi", "_");
+    slug = slug.replace(/ /gi, "_");
 
     return slug;
 }

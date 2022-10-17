@@ -1,13 +1,19 @@
 import { Game } from "../models/game";
 import { Group } from "../models/group";
 
-export function createGame(name: string, group_id: number) {
+export function createGame(name: string, group_slug: string) {
+    const group: any = Group.findOne({
+        where: {
+            slug: group_slug
+        }
+    });
+
     let slug: string = getSlug(name);
 
     let game = Game.create({
         name: name,
         slug: slug,
-        group_id: group_id
+        group_id: group.id
     });
 
     return game;
@@ -31,7 +37,7 @@ export function deleteGame(group_id: number) {
 
 function getSlug(value: string) {
     let slug = value.toLowerCase().trim();
-    slug = slug.replace("/ /gi", "_");
+    slug = slug.replace(/ /gi, "_");
 
     return slug;
 }
