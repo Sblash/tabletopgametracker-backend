@@ -1,3 +1,4 @@
+import { Page } from "../models/page";
 import { Game } from "../models/game";
 import { getGroupBySlug } from "./group-service";
 
@@ -28,6 +29,15 @@ export function deleteGame(group_id: number) {
         where: {
             id: group_id
         }
+    });
+}
+
+export function getGameBySlug(slug: string) {
+    return Game.findOne({
+        where: {
+            slug: slug
+        },
+        include: Page
     });
 }
 

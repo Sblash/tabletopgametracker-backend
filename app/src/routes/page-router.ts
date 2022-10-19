@@ -1,6 +1,7 @@
 import StatusCodes from 'http-status-codes';
 import { Request, Response, Router } from 'express';
 import { createPage, updatePage, getPages, deletePage } from "../services/page-service";
+import { getGameBySlug } from "../services/game-service";
 import { getPageById } from "../repos/page-repo";
 import { Page } from '@models/page';
 
@@ -10,7 +11,7 @@ const { CREATED, OK, BAD_REQUEST } = StatusCodes;
 
 // Paths
 const p = {
-    list: '/',
+    list: '/:game_slug',
     create: "/create",
     update: "/update",
     delete: "/delete"
@@ -18,8 +19,12 @@ const p = {
 
 //Get list pages
 pageRouter.get(p.list, async (_: Request, res: Response) => {
-    const pages = await getPages();
-    return res.status(OK).json({ success: true, pages: pages});
+    const game_slug = _.params.game_slug;
+    const game = await getGameBySlug(game_slug);
+
+    if (!game) return res.status(OK).json({ success:false, message: "The game doesn't exists."});
+
+    return res.status(OK).json({ success: true, pages: game.pages});
 });
 
 //Create page
