@@ -1,8 +1,8 @@
 import { Game } from "../models/game";
 import { Page } from "../models/page";
 
-export function createPage(name: string, game_slug: string) {
-    const game: any = Game.findOne({
+export async function createPage(name: string, game_slug: string) {
+    const game: any = await Game.findOne({
         where: {
             slug: game_slug
         }
