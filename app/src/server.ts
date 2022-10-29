@@ -48,6 +48,10 @@ app.use(function (req, res, next) {
     next();      
   }); 
 
+app.options('/*', (_, res) => {
+    res.sendStatus(200);
+});
+
 // Add api router
 app.use('/api', apiRouter);
 
