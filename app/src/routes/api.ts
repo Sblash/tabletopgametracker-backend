@@ -5,7 +5,7 @@ import { groupRouter } from './group-router';
 import { gameRouter } from './game-router';
 import { pageRouter } from './page-router';
 import { elementRouter } from './element-router';
-import { User } from '../models/user';
+import { dataRouter } from './data-router';
 
 // Export the base-router
 const baseRouter = Router();
@@ -39,6 +39,7 @@ baseRouter.use('/groups', groupRouter);
 baseRouter.use('/games', gameRouter);
 baseRouter.use('/pages', pageRouter);
 baseRouter.use('/elements', elementRouter);
+baseRouter.use('/datas', dataRouter);
 
 // Export default.
 export default baseRouter;
