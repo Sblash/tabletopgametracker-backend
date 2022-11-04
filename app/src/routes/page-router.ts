@@ -2,8 +2,9 @@ import StatusCodes from 'http-status-codes';
 import { Request, Response, Router } from 'express';
 import { createPage, updatePage, getPages, deletePage } from "../services/page-service";
 import { getGameBySlug } from "../services/game-service";
-import { getPageById } from "../repos/page-repo";
+import { getPageById, getPageBySlug } from "../repos/page-repo";
 import { Page } from '@models/page';
+import { Structure } from 'src/interfaces/Structure';
 
 // Constants
 export const pageRouter = Router();
@@ -12,6 +13,7 @@ const { CREATED, OK, BAD_REQUEST } = StatusCodes;
 // Paths
 const p = {
     list: '/:game_slug',
+    get: '/page/:page_slug',
     create: "/create",
     update: "/update",
     delete: "/delete"
@@ -27,11 +29,22 @@ pageRouter.get(p.list, async (_: Request, res: Response) => {
     return res.status(OK).json({ success: true, pages: game.pages});
 });
 
+//Get page
+pageRouter.get(p.get, async (_: Request, res: Response) => {
+    const page_slug = _.params.page_slug;
+    const page = await getPageBySlug(page_slug);
+
+    if (!page) return res.status(OK).json({ success:false, message: "The page doesn't exists."});
+
+    return res.status(OK).json({ success: true, page: page});
+});
+
 //Create page
 pageRouter.post(p.create, async (_: Request, res: Response) => {
     const name: string = _.body.name;
     const game_slug: string = _.body.game_slug;
-    const page = await createPage(name, game_slug);
+    const structure: Structure = _.body.structure;
+    const page = await createPage(name, game_slug, structure);
     return res.status(CREATED).json({ success: true, page: page })
 });
 

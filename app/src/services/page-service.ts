@@ -1,7 +1,9 @@
 import { Game } from "../models/game";
 import { Page } from "../models/page";
+import { Element } from "../models/element";
+import { Structure } from "src/interfaces/Structure";
 
-export async function createPage(name: string, game_slug: string) {
+export async function createPage(name: string, game_slug: string, structure: Structure) {
     const game: any = await Game.findOne({
         where: {
             slug: game_slug
@@ -10,9 +12,10 @@ export async function createPage(name: string, game_slug: string) {
 
     let slug: string = getSlug(name);
 
-    let page = Page.create({
+    let page = await Page.create({
         name: name,
         slug: slug,
+        structure: structure,
         game_id: game.id
     });
 
