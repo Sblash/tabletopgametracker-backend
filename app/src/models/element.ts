@@ -20,6 +20,12 @@ export class Element extends Model {
     })
     slug!: string
 
+    @Column({
+        type: DataType.STRING,
+        allowNull: false
+    })
+    type!: string
+
     @ForeignKey(() => Page)
     @Column({
         type: DataType.INTEGER,

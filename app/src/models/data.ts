@@ -8,10 +8,10 @@ import { Log } from "./log";
 })
 export class Data extends Model {
     @Column({
-        type: DataType.STRING,
+        type: DataType.JSON,
         allowNull: true
     })
-    value!: string
+    value!: JSON
 
     @ForeignKey(() => Element)
     @Column({
