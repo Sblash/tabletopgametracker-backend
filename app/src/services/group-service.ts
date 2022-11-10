@@ -27,6 +27,11 @@ export function updateGroup(group: Group, name: string) {
     return group;
 }
 
+export function getGroups(user: User) {
+    // return Group.findAll();
+    //return all groups where the user is a member
+    return user.$get("groups");
+}
 
 export async function addMembers(group: Group, members: Array<UserInterface>) {
     for (let i = 0; i < members.length; i++) {

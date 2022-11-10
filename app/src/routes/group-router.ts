@@ -1,6 +1,6 @@
 import StatusCodes from 'http-status-codes';
 import { Request, Response, Router } from 'express';
-import { createGroup, updateGroup, getGroups, deleteGroup } from "../services/group-service";
+import { createGroup, updateGroup, getGroups, deleteGroup, addMembers } from "../services/group-service";
 import { getGroupById } from "../repos/group-repo";
 import { Group } from '../models/group';
 import { getJwtTokenFromRequest, getUserFromJwt } from '../services/user-service';
@@ -20,8 +20,16 @@ const p = {
 
 //Get list groups
 groupRouter.get(p.list, async (_: Request, res: Response) => {
-    const groups = await getGroups();
-    return res.status(OK).json({ success: true, groups: groups });
+    const token = getJwtTokenFromRequest(_);
+    if (!token) return res.status(401).json({"error": true, "message": 'Unauthorized access.'});
+    let user = await getUserFromJwt(token);
+
+    if (user) {
+        const groups = await getGroups(user);
+        return res.status(OK).json({ success: true, groups: groups });
+    }
+
+    return res.status(400).json({"error": true, "message": 'Unauthorized access.'});
 });
 
 //Create group
@@ -37,7 +45,7 @@ groupRouter.post(p.create, async (_: Request, res: Response) => {
         let group = await createGroup(name, user);
         
         await addMembers(group, members);
-        
+
         return res.status(CREATED).json({ success: true, group: group })
     }
 
