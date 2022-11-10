@@ -1,7 +1,7 @@
 import { User } from '../models/user';
-import { UserNotFoundError } from '@shared/errors';
 import { Request } from 'express';
 import { getUserByTelegramId } from '../repos/user-repo';
+import { Op } from 'sequelize';
 
 export function createUser(username: string, telegram_id: number) {
     let user = User.create({
@@ -35,4 +35,15 @@ export async function getUserFromJwt(token: string): Promise<User | null> {
     })
 
     return user;
+}
+
+export async function searchUserByUsername(username: string): Promise<User[]> {
+    return await User.findAll({
+        attributes: ['id', 'username'],
+        where: {
+            username: {
+                [Op.like]: '%' + username + '%'
+            }
+        }
+    });
 }

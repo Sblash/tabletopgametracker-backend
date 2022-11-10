@@ -1,25 +1,33 @@
 import StatusCodes from 'http-status-codes';
 import { Request, Response, Router } from 'express';
-import { ParamMissingError } from '@shared/errors';
+import { User } from "../models/user";
+import { searchUserByUsername } from '../services/user-service';
 
 // Constants
 const router = Router();
-const { CREATED, OK } = StatusCodes;
+const { OK } = StatusCodes;
 
 // Paths
 const p = {
-    get: '/',
+    search_username: '/search-by-username',
     // add: '/add',
     // update: '/update',
     // delete: '/delete/:id',
 } as const;
 
 /**
- * Get all users.
+ * Search users by username.
  */
-router.get(p.get, async (_: Request, res: Response) => {
-    // const users = await userService.getAll();
-    // return res.status(OK).json({users});
+router.get(p.search_username, async (_: Request, res: Response) => {
+    const username: any = _.query.username;
+    
+    if (!username) return res.status(OK).json({success: false, message: "username param can't be null."});
+
+    let users: Array<User> = await searchUserByUsername(username);
+
+    if (users.length <= 0) return res.status(OK).json({success: false, message: "No user found."});
+
+    return res.status(OK).json({success: true, users: users});
 });
 
 
