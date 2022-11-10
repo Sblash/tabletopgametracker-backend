@@ -4,6 +4,7 @@ import { createGroup, updateGroup, getGroups, deleteGroup } from "../services/gr
 import { getGroupById } from "../repos/group-repo";
 import { Group } from '../models/group';
 import { getJwtTokenFromRequest, getUserFromJwt } from '../services/user-service';
+import { User as UserInterface } from '../interfaces/User';
 
 // Constants
 export const groupRouter = Router();
@@ -26,15 +27,17 @@ groupRouter.get(p.list, async (_: Request, res: Response) => {
 //Create group
 groupRouter.post(p.create, async (_: Request, res: Response) => {
     let name: string = _.body.name;
+    let members: Array<UserInterface> = _.body.members;
     
     const token = getJwtTokenFromRequest(_);
     if (!token) return res.status(401).json({"error": true, "message": 'Unauthorized access.'});
     let user = await getUserFromJwt(token);
 
     if (user) {
-        const created_by: number = user.id;
+        let group = await createGroup(name, user);
         
-        let group = await createGroup(name, created_by);
+        await addMembers(group, members);
+        
         return res.status(CREATED).json({ success: true, group: group })
     }
 

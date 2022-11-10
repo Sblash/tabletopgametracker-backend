@@ -11,7 +11,6 @@ import { dataRouter } from './data-router';
 const baseRouter = Router();
 
 // Setup routers
-baseRouter.use('/user', userRouter);
 baseRouter.use('/auth', authRouter);
 
 //CHECK JWT AUTHENTICATION
@@ -35,6 +34,7 @@ baseRouter.use(function (req, res, next) {
     })
 });
 
+baseRouter.use('/users', userRouter);
 baseRouter.use('/groups', groupRouter);
 baseRouter.use('/games', gameRouter);
 baseRouter.use('/pages', pageRouter);
