@@ -33,13 +33,27 @@ export async function createElementsFromStructure(page_slug:string, structure: S
     for (let r = 0; r < structure.rows.length; r++) {
         for (let c = 0; c < structure.rows[r].cols.length; c++) {
             for (let e = 0; e < structure.rows[r].cols[c].elements.length; e++) {
-                let element = await Element.create({
-                    name: structure.rows[r].cols[c].elements[e].name,
-                    type: structure.rows[r].cols[c].elements[e].type,
-                    slug: getSlug(structure.rows[r].cols[c].elements[e].name),
-                    page_id: page.id
+                let element_slug = getSlug(structure.rows[r].cols[c].elements[e].name);
+                let element: Element | null;
+                
+                //check if already exists first
+                element = await Element.findOne({
+                    where: {
+                        slug: element_slug,
+                        page_id: page.id
+                    }
                 });
-                elements.push(element);
+
+                if (!element) {
+                    element = await Element.create({
+                        name: structure.rows[r].cols[c].elements[e].name,
+                        type: structure.rows[r].cols[c].elements[e].type,
+                        slug: element_slug,
+                        page_id: page.id
+                    });
+
+                    elements.push(element);
+                }
             }
         }
     }
