@@ -1,7 +1,7 @@
 import { Game } from "../models/game";
 import { Page } from "../models/page";
-import { Element } from "../models/element";
 import { Structure } from "src/interfaces/Structure";
+import { createElementsFromStructure, updateElementsFromStructure, deleteElementsFromStructure } from '../services/element-service';
 
 export async function createPage(name: string, game_slug: string, structure: Structure) {
     const game: any = await Game.findOne({
@@ -22,10 +22,15 @@ export async function createPage(name: string, game_slug: string, structure: Str
     return page;
 }
 
-export function updatePage(page: Page, name: string) {
+export async function updatePage(page: Page, name: string, structure: Structure) {
     page.update({
-        name: name
+        name: name,
+        structure: structure
     });
+
+    await createElementsFromStructure(page.slug, structure);
+    await updateElementsFromStructure(page.slug, structure);
+    await deleteElementsFromStructure(page.slug, structure);
 
     return page;
 }

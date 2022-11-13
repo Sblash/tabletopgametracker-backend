@@ -51,7 +51,8 @@ pageRouter.post(p.create, async (_: Request, res: Response) => {
 //Update page
 pageRouter.put(p.update, async (_: Request, res: Response) => {
     let name: string = _.body.name;
-    let page_id: number = _.body.page_id;
+    let page_id: number = _.body.id;
+    const structure: Structure = _.body.structure;
 
     let page: Page | null = await getPageById(page_id);
 
@@ -61,7 +62,7 @@ pageRouter.put(p.update, async (_: Request, res: Response) => {
         })
     }
 
-    page = await updatePage(page, name);
+    page = await updatePage(page, name, structure);
     return res.status(OK).json({ success: true, page: page })
 });
 
