@@ -29,7 +29,8 @@ export class Element extends Model {
     @ForeignKey(() => Page)
     @Column({
         type: DataType.INTEGER,
-        allowNull: true
+        allowNull: true,
+        onDelete: "CASCADE"
     })
     page_id!: number
 

@@ -16,7 +16,8 @@ export class Data extends Model {
     @ForeignKey(() => Element)
     @Column({
         type: DataType.INTEGER,
-        allowNull: true
+        allowNull: true,
+        onDelete: "CASCADE"
     })
     element_id!: number
 

@@ -29,7 +29,8 @@ export class Page extends Model {
     @ForeignKey(() => Game)
     @Column({
         type: DataType.INTEGER,
-        allowNull: true
+        allowNull: true,
+        onDelete: "CASCADE"
     })
     game_id!: number
 

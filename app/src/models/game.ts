@@ -29,7 +29,8 @@ export class Game extends Model {
   @ForeignKey(() => Group)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false
+    allowNull: false,
+    onDelete: "CASCADE"
   })
   group_id!: number
 
