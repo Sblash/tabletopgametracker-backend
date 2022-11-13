@@ -13,6 +13,7 @@ export interface Col {
 export interface Element {
     name: string,
     type: string,
+    slug: string,
     row_index: number | undefined,
     col_index: number | undefined
 }
