@@ -54,11 +54,15 @@ groupRouter.post(p.create, async (_: Request, res: Response) => {
     let user = await getUserFromJwt(token);
 
     if (user) {
-        let group = await createGroup(name, user, profile_pic);
+        try {
+            let group = await createGroup(name, user, profile_pic);
         
-        await addMembers(group, members);
+            await addMembers(group, members);
 
-        return res.status(CREATED).json({ success: true, group: group })
+            return res.status(CREATED).json({ success: true, group: group })
+        } catch(e) {
+            return res.status(OK).json({success: false, message: e.name});
+        }
     }
 
     return res.status(400).json({"error": true, "message": 'Unauthorized access.'});
@@ -79,13 +83,17 @@ groupRouter.put(p.update, async (_: Request, res: Response) => {
         })
     }
 
-    group = await updateGroup(group, name, profile_pic);
+    try {
+        group = await updateGroup(group, name, profile_pic);
 
-    if (members) {
-        await updateMembers(group, members);
+        if (members) {
+            await updateMembers(group, members);
+        }
+
+        return res.status(OK).json({ success: true, group: group })
+    } catch(e) {
+        return res.status(OK).json({success: false, message: e});
     }
-
-    return res.status(OK).json({ success: true, group: group })
 });
 
 groupRouter.delete(p.delete, async (_: Request, res: Response) => {

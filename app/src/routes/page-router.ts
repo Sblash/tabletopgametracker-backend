@@ -44,8 +44,13 @@ pageRouter.post(p.create, async (_: Request, res: Response) => {
     const name: string = _.body.name;
     const game_slug: string = _.body.game_slug;
     const structure: Structure = _.body.structure;
-    const page = await createPage(name, game_slug, structure);
-    return res.status(CREATED).json({ success: true, page: page })
+
+    try {
+        const page = await createPage(name, game_slug, structure);
+        return res.status(CREATED).json({ success: true, page: page })
+    } catch(e) {
+        return res.status(OK).json({success: false, message: e.name});
+    }
 });
 
 //Update page
