@@ -1,4 +1,4 @@
-import { DataType, Model, Table, Column, CreatedAt, UpdatedAt, ForeignKey, BelongsToMany, HasMany } from "sequelize-typescript";
+import { DataType, Model, Table, Column, CreatedAt, UpdatedAt, ForeignKey, BelongsToMany, HasMany, Index } from "sequelize-typescript";
 import { User } from "./user";
 import { UserGroup } from "./user-group";
 import { Game } from "./game";
@@ -16,6 +16,11 @@ export class Group extends Model {
     })
     name!: string
 
+    @Index({
+        name: 'slug_idx',
+        type: 'UNIQUE',
+        unique: true,
+    })
     @Column({
         type: DataType.STRING,
         allowNull: false

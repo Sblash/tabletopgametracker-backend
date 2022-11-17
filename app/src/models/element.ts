@@ -1,4 +1,4 @@
-import { DataType, Model, Table, Column, CreatedAt, UpdatedAt, ForeignKey, HasMany } from "sequelize-typescript";
+import { DataType, Model, Table, Column, CreatedAt, UpdatedAt, ForeignKey, HasMany, Index } from "sequelize-typescript";
 import { Page } from "./page";
 import { Data } from "./data";
 import { Log } from "./log";
@@ -14,6 +14,11 @@ export class Element extends Model {
     })
     name!: string
 
+    @Index({
+        name: 'slug_idx',
+        type: 'UNIQUE',
+        unique: true,
+      })
     @Column({
         type: DataType.STRING,
         allowNull: false
