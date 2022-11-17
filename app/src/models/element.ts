@@ -14,11 +14,6 @@ export class Element extends Model {
     })
     name!: string
 
-    @Index({
-        name: 'slug_idx',
-        type: 'UNIQUE',
-        unique: true,
-      })
     @Column({
         type: DataType.STRING,
         allowNull: false
