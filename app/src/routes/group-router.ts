@@ -37,7 +37,6 @@ groupRouter.get(p.list, async (_: Request, res: Response) => {
 groupRouter.get(p.get, async (_: Request, res: Response) => {
     const group_slug = _.params.group_slug;
     const group = await getGroupBySlug(group_slug);
-    console.log(group);
 
     if (!group) return res.status(OK).json({ success:false, message: "The group doesn't exists."});
 

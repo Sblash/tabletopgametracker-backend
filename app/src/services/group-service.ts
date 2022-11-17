@@ -74,7 +74,6 @@ export async function updateMembers(group: Group, members: Array<UserInterface>)
     }
 
     let existing_members = group.users;
-    console.log("existing_members:", existing_members);
 
     for (let em = 0; em < existing_members.length; em++) {
         let to_delete = true;
