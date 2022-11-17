@@ -2,14 +2,16 @@ import { Game } from "../models/game";
 import { Group } from "../models/group";
 import { User } from "../models/user";
 import { User as UserInterface } from '../interfaces/User';
+import { UserGroup } from "../models/user-group";
 
-export async function createGroup(name: string, user: User) {
+export async function createGroup(name: string, user: User, profile_pic: string) {
     const created_by: number = user.id;
     let slug: string = getSlug(name);
 
     let group = await Group.create({
         name: name,
         slug: slug,
+        profile_pic: profile_pic,
         created_by: created_by
     });
 
@@ -19,9 +21,10 @@ export async function createGroup(name: string, user: User) {
     return group;
 }
 
-export function updateGroup(group: Group, name: string) {
+export function updateGroup(group: Group, name: string, profile_pic: string) {
     group.update({
-        name: name
+        name: name,
+        profile_pic: profile_pic
     });
 
     return group;
@@ -44,6 +47,48 @@ export async function addMembers(group: Group, members: Array<UserInterface>) {
         if (!member) continue;
 
         group.$add("user", member);
+    }
+}
+
+export async function updateMembers(group: Group, members: Array<UserInterface>) {
+    //for new members
+    for (let i = 0; i < members.length; i++) {
+        let member: User | null = await User.findOne({
+            where: {
+                id: members[i].id
+            },
+        });
+
+        if (!member) continue;
+
+        let is_member_in_group: UserGroup | null = await UserGroup.findOne({
+            where: {
+                user_id: member.id,
+                group_id: group.id
+            }
+        })
+
+        if (is_member_in_group) continue;
+
+        group.$add("user", member);
+    }
+
+    let existing_members = group.users;
+    console.log("existing_members:", existing_members);
+
+    for (let em = 0; em < existing_members.length; em++) {
+        let to_delete = true;
+        
+        for (let m = 0; m < members.length; m++) {
+            if (existing_members[em].id == members[m].id) {
+                to_delete = false;
+                break;
+            }
+        }
+
+        if (to_delete) {
+            group.$remove("user", existing_members[em]);
+        }
     }
 }
 

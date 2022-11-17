@@ -1,7 +1,7 @@
 import StatusCodes from 'http-status-codes';
 import { Request, Response, Router } from 'express';
-import { createGroup, updateGroup, getGroups, deleteGroup, addMembers } from "../services/group-service";
-import { getGroupById } from "../repos/group-repo";
+import { createGroup, updateGroup, getGroups, deleteGroup, addMembers, updateMembers } from "../services/group-service";
+import { getGroupById, getGroupBySlug } from "../repos/group-repo";
 import { Group } from '../models/group';
 import { getJwtTokenFromRequest, getUserFromJwt } from '../services/user-service';
 import { User as UserInterface } from '../interfaces/User';
@@ -13,6 +13,7 @@ const { CREATED, OK, BAD_REQUEST } = StatusCodes;
 // Paths
 const p = {
     list: '/',
+    get: '/group/:group_slug',
     create: "/create",
     update: "/update",
     delete: "/delete"
@@ -32,9 +33,21 @@ groupRouter.get(p.list, async (_: Request, res: Response) => {
     return res.status(400).json({"error": true, "message": 'Unauthorized access.'});
 });
 
+//Get group
+groupRouter.get(p.get, async (_: Request, res: Response) => {
+    const group_slug = _.params.group_slug;
+    const group = await getGroupBySlug(group_slug);
+    console.log(group);
+
+    if (!group) return res.status(OK).json({ success:false, message: "The group doesn't exists."});
+
+    return res.status(OK).json({ success: true, group: group});
+});
+
 //Create group
 groupRouter.post(p.create, async (_: Request, res: Response) => {
     let name: string = _.body.name;
+    let profile_pic: string = _.body.profile_pic;
     let members: Array<UserInterface> = _.body.members;
     
     const token = getJwtTokenFromRequest(_);
@@ -42,7 +55,7 @@ groupRouter.post(p.create, async (_: Request, res: Response) => {
     let user = await getUserFromJwt(token);
 
     if (user) {
-        let group = await createGroup(name, user);
+        let group = await createGroup(name, user, profile_pic);
         
         await addMembers(group, members);
 
@@ -55,7 +68,9 @@ groupRouter.post(p.create, async (_: Request, res: Response) => {
 //Update group
 groupRouter.put(p.update, async (_: Request, res: Response) => {
     let name: string = _.body.name;
-    let group_id: number = _.body.group_id;
+    let group_id: number = _.body.id;
+    let profile_pic: string = _.body.profile_pic;
+    let members: Array<UserInterface> = _.body.members;
 
     let group: Group | null = await getGroupById(group_id);
 
@@ -65,7 +80,12 @@ groupRouter.put(p.update, async (_: Request, res: Response) => {
         })
     }
 
-    group = await updateGroup(group, name);
+    group = await updateGroup(group, name, profile_pic);
+
+    if (members) {
+        await updateMembers(group, members);
+    }
+
     return res.status(OK).json({ success: true, group: group })
 });
 
