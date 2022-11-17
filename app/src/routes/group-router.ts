@@ -36,6 +36,9 @@ groupRouter.get(p.list, async (_: Request, res: Response) => {
 //Get group
 groupRouter.get(p.get, async (_: Request, res: Response) => {
     const group_slug = _.params.group_slug;
+
+    if (!group_slug) return res.status(OK).json({success: false, message: "Parameter 'group_slug' can't be null."});
+
     const group = await getGroupBySlug(group_slug);
 
     if (!group) return res.status(OK).json({ success:false, message: "The group doesn't exists."});
@@ -48,6 +51,8 @@ groupRouter.post(p.create, async (_: Request, res: Response) => {
     let name: string = _.body.name;
     let profile_pic: string = _.body.profile_pic;
     let members: Array<UserInterface> = _.body.members;
+
+    if (!name) return res.status(OK).json({success: false, message: "Parameter 'name' can't be null."});
     
     const token = getJwtTokenFromRequest(_);
     if (!token) return res.status(401).json({"error": true, "message": 'Unauthorized access.'});
@@ -61,7 +66,7 @@ groupRouter.post(p.create, async (_: Request, res: Response) => {
 
             return res.status(CREATED).json({ success: true, group: group })
         } catch(e) {
-            return res.status(OK).json({success: false, message: e.name});
+            return res.status(OK).json({success: false, message: e.message});
         }
     }
 
@@ -74,6 +79,9 @@ groupRouter.put(p.update, async (_: Request, res: Response) => {
     let group_id: number = _.body.id;
     let profile_pic: string = _.body.profile_pic;
     let members: Array<UserInterface> = _.body.members;
+
+    if (!name) return res.status(OK).json({success: false, message: "Parameter 'name' can't be null."});
+    if (!group_id) return res.status(OK).json({success: false, message: "Parameter 'group_id' can't be null."});
 
     let group: Group | null = await getGroupById(group_id);
 
@@ -92,12 +100,14 @@ groupRouter.put(p.update, async (_: Request, res: Response) => {
 
         return res.status(OK).json({ success: true, group: group })
     } catch(e) {
-        return res.status(OK).json({success: false, message: e});
+        return res.status(OK).json({success: false, message: e.message});
     }
 });
 
 groupRouter.delete(p.delete, async (_: Request, res: Response) => {
     const group_id: number = _.body.group_id;
+
+    if (!group_id) return res.status(OK).json({success: false, message: "Parameter 'group_id' can't be null."});
 
     try {
         if (!group_id) return res.status(OK).json({ success: false, message: "group_id can't be null." });

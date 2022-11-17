@@ -2,6 +2,7 @@ import { Game } from "../models/game";
 import { Page } from "../models/page";
 import { Structure } from "src/interfaces/Structure";
 import { createElementsFromStructure, updateElementsFromStructure, deleteElementsFromStructure } from '../services/element-service';
+import { getSlug, sanitizeText, validate, sanitizeSlug } from "../services/base-service";
 
 export async function createPage(name: string, game_slug: string, structure: Structure) {
     const game: any = await Game.findOne({
@@ -10,7 +11,12 @@ export async function createPage(name: string, game_slug: string, structure: Str
         }
     });
 
+    name = sanitizeText(name);
+
+    if (!validate(name)) throw new Error("The name exceeds the limit of 15 characters."); 
+
     let slug: string = getSlug(name);
+    structure = sanitizeStructure(structure, true);
 
     let page = await Page.create({
         name: name,
@@ -23,6 +29,14 @@ export async function createPage(name: string, game_slug: string, structure: Str
 }
 
 export async function updatePage(page: Page, name: string, structure: Structure) {
+    name = sanitizeText(name);
+
+    if (!validate(name)) throw new Error("The name exceeds the limit of 15 characters.");
+    
+    structure = sanitizeStructure(structure, false);
+
+    if (!validateStructure(structure)) throw new Error("There is at least one element's name that exceeds the limit of 15 characters.");
+
     page.update({
         name: name,
         structure: structure
@@ -47,9 +61,33 @@ export function deletePage(page_id: number) {
     });
 }
 
-function getSlug(value: string) {
-    let slug = value.toLowerCase().trim();
-    slug = slug.replace(/ /gi, "_");
+function sanitizeStructure(structure: Structure, is_create: boolean) {
+    for (let r = 0; r < structure.rows.length; r++) {
+        for (let c = 0; c < structure.rows[r].cols.length; c++) {
+            for (let e = 0; e < structure.rows[r].cols[c].elements.length; e++) {
+                let element_name = structure.rows[r].cols[c].elements[e].name;
+                element_name = sanitizeText(element_name);
+                structure.rows[r].cols[c].elements[e].name = element_name;
+                
+                let element_slug = structure.rows[r].cols[c].elements[e].slug;
+                element_slug = sanitizeSlug(element_slug);
+                structure.rows[r].cols[c].elements[e].slug = element_slug;
+            }
+        }
+    }
 
-    return slug;
+    return structure;
+}
+
+function validateStructure(structure: Structure) {
+    for (let r = 0; r < structure.rows.length; r++) {
+        for (let c = 0; c < structure.rows[r].cols.length; c++) {
+            for (let e = 0; e < structure.rows[r].cols[c].elements.length; e++) {
+                let element_name = structure.rows[r].cols[c].elements[e].name;
+                if (element_name.length > 15) return false;
+            }
+        }
+    }
+
+    return true;
 }

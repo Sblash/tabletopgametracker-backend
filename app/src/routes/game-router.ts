@@ -21,6 +21,9 @@ const p = {
 //Get list games
 gameRouter.get(p.list, async (_: Request, res: Response) => {
     const group_slug = _.params.group_slug;
+    
+    if (!group_slug) return res.status(OK).json({success: false, message: "Parameter 'group_slug' can't be null."});
+
     const group = await getGroupBySlug(group_slug);
 
     if (!group) return res.status(OK).json({ success:false, message: "The group doesn't exists."});
@@ -31,6 +34,9 @@ gameRouter.get(p.list, async (_: Request, res: Response) => {
 //Get game
 gameRouter.get(p.get, async (_: Request, res: Response) => {
     const game_slug = _.params.game_slug;
+
+    if (!game_slug) return res.status(OK).json({success: false, message: "Parameter 'game_slug' can't be null."});
+
     const game = await getGameBySlug(game_slug);
 
     if (!game) return res.status(OK).json({ success:false, message: "The game doesn't exists."});
@@ -42,11 +48,15 @@ gameRouter.get(p.get, async (_: Request, res: Response) => {
 gameRouter.post(p.create, async (_: Request, res: Response) => {
     const name: string = _.body.name;
     const group_slug: string = _.body.group_slug;
+
+    if (!name) return res.status(OK).json({success: false, message: "Parameter 'name' can't be null."});
+    if (!group_slug) return res.status(OK).json({success: false, message: "Parameter 'group_slug' can't be null."});
+
     try {
         const game = await createGame(name, group_slug);
         return res.status(CREATED).json({ success: true, game: game })
     } catch (e) {
-        return res.status(OK).json({success: false, message: e.name});
+        return res.status(OK).json({success: false, message: e.message});
     }
 });
 
@@ -56,6 +66,9 @@ gameRouter.put(p.update, async (_: Request, res: Response) => {
     let game_id: number = _.body.id;
     let profile_pic: string = _.body.profile_pic;
 
+    if (!name) return res.status(OK).json({success: false, message: "Parameter 'name' can't be null."});
+    if (!game_id) return res.status(OK).json({success: false, message: "Parameter 'game_id' can't be null."});
+
     let game: Game | null = await getGameById(game_id);
 
     if (!game) {
@@ -64,13 +77,19 @@ gameRouter.put(p.update, async (_: Request, res: Response) => {
         })
     }
 
-    game = await updateGame(game, name, profile_pic);
-    return res.status(OK).json({ success: true, game: game })
+    try {
+        game = await updateGame(game, name, profile_pic);
+        return res.status(OK).json({ success: true, game: game })
+    } catch (e) {
+        return res.status(OK).json({success: false, message: e.message});
+    }
 });
 
 //Delete game
 gameRouter.delete(p.delete, async (_: Request, res: Response) => {
     const game_id: number = _.body.game_id;
+
+    if (!game_id) return res.status(OK).json({success: false, message: "Parameter 'game_id' can't be null."});
 
     try {
         if (!game_id) return res.status(OK).json({ success: false, message: "game_id can't be null." });

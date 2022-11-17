@@ -67,8 +67,12 @@ pageRouter.put(p.update, async (_: Request, res: Response) => {
         })
     }
 
-    page = await updatePage(page, name, structure);
-    return res.status(OK).json({ success: true, page: page })
+    try {
+        page = await updatePage(page, name, structure);
+        return res.status(OK).json({ success: true, page: page })
+    } catch(e) {
+        return res.status(OK).json({success: false, message: e.message});
+    }
 });
 
 //Delete page

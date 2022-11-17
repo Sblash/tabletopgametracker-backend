@@ -1,9 +1,14 @@
 import { Page } from "../models/page";
 import { Game } from "../models/game";
 import { getGroupBySlug } from "./group-service";
+import { getSlug, sanitizeText, validate } from "../services/base-service";
 
 export async function createGame(name: string, group_slug: string) {
     const group: any = await getGroupBySlug(group_slug);
+
+    name = sanitizeText(name);
+
+    if (!validate(name)) throw new Error("The name exceeds the limit of 15 characters."); 
 
     let slug: string = getSlug(name);
 
@@ -17,6 +22,10 @@ export async function createGame(name: string, group_slug: string) {
 }
 
 export function updateGame(game: Game, name: string, profile_pic: string) {
+    name = sanitizeText(name);
+
+    if (!validate(name)) throw new Error("The name exceeds the limit of 15 characters."); 
+    
     game.update({
         name: name,
         profile_pic: profile_pic
@@ -40,11 +49,4 @@ export function getGameBySlug(slug: string) {
         },
         include: Page
     });
-}
-
-function getSlug(value: string) {
-    let slug = value.toLowerCase().trim();
-    slug = slug.replace(/ /gi, "_");
-
-    return slug;
 }

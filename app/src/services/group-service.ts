@@ -3,9 +3,14 @@ import { Group } from "../models/group";
 import { User } from "../models/user";
 import { User as UserInterface } from '../interfaces/User';
 import { UserGroup } from "../models/user-group";
+import { getSlug, sanitizeText, validate } from "../services/base-service";
 
 export async function createGroup(name: string, user: User, profile_pic: string) {
     const created_by: number = user.id;
+    name = sanitizeText(name);
+
+    if (!validate(name)) throw new Error("The name exceeds the limit of 15 characters."); 
+
     let slug: string = getSlug(name);
 
     let group = await Group.create({
@@ -22,6 +27,10 @@ export async function createGroup(name: string, user: User, profile_pic: string)
 }
 
 export function updateGroup(group: Group, name: string, profile_pic: string) {
+    name = sanitizeText(name);
+
+    if (!validate(name)) throw new Error("The name exceeds the limit of 15 characters."); 
+    
     group.update({
         name: name,
         profile_pic: profile_pic
@@ -106,11 +115,4 @@ export function deleteGroup(group_id: number) {
             id: group_id
         }
     });
-}
-
-function getSlug(value: string) {
-    let slug = value.toLowerCase().trim();
-    slug = slug.replace(/ /gi, "_");
-
-    return slug;
 }
