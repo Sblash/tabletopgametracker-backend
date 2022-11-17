@@ -22,6 +22,12 @@ export class Group extends Model {
     })
     slug!: string
 
+    @Column({
+        type: DataType.STRING,
+        allowNull: true
+    })
+    profile_pic!: string
+
     @ForeignKey(() => User)
     @Column({
         type: DataType.INTEGER,
