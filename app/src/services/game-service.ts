@@ -16,9 +16,10 @@ export async function createGame(name: string, group_slug: string) {
     return game;
 }
 
-export function updateGame(game: Game, name: string) {
+export function updateGame(game: Game, name: string, profile_pic: string) {
     game.update({
-        name: name
+        name: name,
+        profile_pic: profile_pic
     });
 
     return game;

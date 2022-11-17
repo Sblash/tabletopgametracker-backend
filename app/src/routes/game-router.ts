@@ -2,7 +2,7 @@ import StatusCodes from 'http-status-codes';
 import { Request, Response, Router } from 'express';
 import { createGame, updateGame, deleteGame } from "../services/game-service";
 import { getGroupBySlug } from "../services/group-service";
-import { getGameById } from "../repos/game-repo";
+import { getGameById, getGameBySlug } from "../repos/game-repo";
 import { Game } from '../models/game';
 
 // Constants
@@ -12,6 +12,7 @@ const { CREATED, OK, BAD_REQUEST } = StatusCodes;
 // Paths
 const p = {
     list: '/:group_slug',
+    get: '/game/:game_slug',
     create: "/create",
     update: "/update",
     delete: "/delete"
@@ -27,6 +28,16 @@ gameRouter.get(p.list, async (_: Request, res: Response) => {
     return res.status(OK).json({ success:true, games: group.games});
 });
 
+//Get game
+gameRouter.get(p.get, async (_: Request, res: Response) => {
+    const game_slug = _.params.game_slug;
+    const game = await getGameBySlug(game_slug);
+
+    if (!game) return res.status(OK).json({ success:false, message: "The game doesn't exists."});
+
+    return res.status(OK).json({ success: true, game: game});
+});
+
 //Create game
 gameRouter.post(p.create, async (_: Request, res: Response) => {
     const name: string = _.body.name;
@@ -38,7 +49,8 @@ gameRouter.post(p.create, async (_: Request, res: Response) => {
 //Update game
 gameRouter.put(p.update, async (_: Request, res: Response) => {
     let name: string = _.body.name;
-    let game_id: number = _.body.game_id;
+    let game_id: number = _.body.id;
+    let profile_pic: string = _.body.profile_pic;
 
     let game: Game | null = await getGameById(game_id);
 
@@ -48,7 +60,7 @@ gameRouter.put(p.update, async (_: Request, res: Response) => {
         })
     }
 
-    game = await updateGame(game, name);
+    game = await updateGame(game, name, profile_pic);
     return res.status(OK).json({ success: true, game: game })
 });
 
