@@ -73,7 +73,7 @@ authRouter.post(p.login, async (_: Request, res: Response) => {
         telegram_id: user.telegram_id
     }
 
-    let newToken: string = jwt.sign(userObject, process.env.JWT_ACCESS_KEY, { expiresIn: 900})
+    let newToken: string = jwt.sign(userObject, process.env.JWT_ACCESS_KEY, { expiresIn: 86400})
 
     return res.status(OK).json({
         "access_token": newToken
