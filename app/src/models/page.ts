@@ -1,6 +1,7 @@
 import { DataType, Model, Table, Column, CreatedAt, UpdatedAt, ForeignKey, HasMany, Index } from "sequelize-typescript";
 import { Game } from "./game";
 import { Element } from "./element";
+import { User } from "./user";
 import { Log } from "./log";
 
 @Table({
@@ -31,6 +32,12 @@ export class Page extends Model {
     })
     structure!: JSON
 
+    @Column({
+        type: DataType.BOOLEAN,
+        allowNull: false
+    })
+    is_private!: boolean
+
     @ForeignKey(() => Game)
     @Column({
         type: DataType.INTEGER,
@@ -41,6 +48,13 @@ export class Page extends Model {
 
     @HasMany(() => Element)
     elements!: Element[]
+
+    @ForeignKey(() => User)
+    @Column({
+        type: DataType.INTEGER,
+        allowNull: true
+    })
+    created_by!: number
 
     @HasMany(() => Log)
     logs!: Log[]

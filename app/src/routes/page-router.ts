@@ -5,6 +5,7 @@ import { getGameBySlug } from "../services/game-service";
 import { getPageById, getPageBySlug } from "../repos/page-repo";
 import { Page } from '@models/page';
 import { Structure } from 'src/interfaces/Structure';
+import { getJwtTokenFromRequest, getUserFromJwt } from '../services/user-service';
 
 // Constants
 export const pageRouter = Router();
@@ -21,12 +22,20 @@ const p = {
 
 //Get list pages
 pageRouter.get(p.list, async (_: Request, res: Response) => {
+    const token = getJwtTokenFromRequest(_);
+    if (!token) return res.status(401).json({"error": true, "message": 'Unauthorized access.'});
+    let user = await getUserFromJwt(token);
+
+    if (!user) return res.status(400).json({"error": true, "message": 'Unauthorized access.'});
+
     const game_slug = _.params.game_slug;
     const game = await getGameBySlug(game_slug);
 
     if (!game) return res.status(OK).json({ success:false, message: "The game doesn't exists."});
 
-    return res.status(OK).json({ success: true, pages: game.pages});
+    const pages = await getPages(user, game);
+
+    return res.status(OK).json({ success: true, pages: pages});
 });
 
 //Get page
@@ -41,22 +50,32 @@ pageRouter.get(p.get, async (_: Request, res: Response) => {
 
 //Create page
 pageRouter.post(p.create, async (_: Request, res: Response) => {
+    const token = getJwtTokenFromRequest(_);
+    if (!token) return res.status(401).json({"error": true, "message": 'Unauthorized access.'});
+    let user = await getUserFromJwt(token);
+    
     const name: string = _.body.name;
     const game_slug: string = _.body.game_slug;
+    const is_private: boolean = _.body.is_private;
     const structure: Structure = _.body.structure;
 
-    try {
-        const page = await createPage(name, game_slug, structure);
-        return res.status(CREATED).json({ success: true, page: page })
-    } catch(e) {
-        return res.status(OK).json({success: false, message: e.name});
+    if (user) {
+        try {
+            const page = await createPage(name, game_slug, is_private, user, structure);
+            return res.status(CREATED).json({ success: true, page: page })
+        } catch(e) {
+            return res.status(OK).json({success: false, message: e.name});
+        }
     }
+
+    return res.status(400).json({"error": true, "message": 'Unauthorized access.'});
 });
 
 //Update page
 pageRouter.put(p.update, async (_: Request, res: Response) => {
     let name: string = _.body.name;
     let page_id: number = _.body.id;
+    let is_private: boolean = _.body.is_private;
     const structure: Structure = _.body.structure;
 
     let page: Page | null = await getPageById(page_id);
@@ -68,7 +87,7 @@ pageRouter.put(p.update, async (_: Request, res: Response) => {
     }
 
     try {
-        page = await updatePage(page, name, structure);
+        page = await updatePage(page, name, is_private, structure);
         return res.status(OK).json({ success: true, page: page })
     } catch(e) {
         return res.status(OK).json({success: false, message: e.message});
