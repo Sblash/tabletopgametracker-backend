@@ -9,7 +9,7 @@ export async function createGroup(name: string, user: User, profile_pic: string)
     const created_by: number = user.id;
     name = sanitizeText(name);
 
-    if (!validate(name)) throw new Error("The name exceeds the limit of 15 characters."); 
+    if (!validate(name)) throw new Error("The name exceeds the limit of 30 characters."); 
 
     let slug: string = getSlug(name);
 
@@ -29,7 +29,7 @@ export async function createGroup(name: string, user: User, profile_pic: string)
 export function updateGroup(group: Group, name: string, profile_pic: string) {
     name = sanitizeText(name);
 
-    if (!validate(name)) throw new Error("The name exceeds the limit of 15 characters."); 
+    if (!validate(name)) throw new Error("The name exceeds the limit of 30 characters."); 
     
     group.update({
         name: name,

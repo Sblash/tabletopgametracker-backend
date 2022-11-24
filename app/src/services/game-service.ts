@@ -8,7 +8,7 @@ export async function createGame(name: string, group_slug: string) {
 
     name = sanitizeText(name);
 
-    if (!validate(name)) throw new Error("The name exceeds the limit of 15 characters."); 
+    if (!validate(name)) throw new Error("The name exceeds the limit of 30 characters."); 
 
     let slug: string = getSlug(name);
 
@@ -24,7 +24,7 @@ export async function createGame(name: string, group_slug: string) {
 export function updateGame(game: Game, name: string, profile_pic: string) {
     name = sanitizeText(name);
 
-    if (!validate(name)) throw new Error("The name exceeds the limit of 15 characters."); 
+    if (!validate(name)) throw new Error("The name exceeds the limit of 30 characters."); 
     
     game.update({
         name: name,

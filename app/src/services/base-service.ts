@@ -25,6 +25,6 @@ export function sanitizeSlug(text: string) {
 }
 
 export function validate(name: string) {
-    if (name.length > 15) return false;
+    if (name.length > 30) return false;
     return true;
 }

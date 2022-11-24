@@ -1,10 +1,12 @@
 import { Game } from "../models/game";
 import { Page } from "../models/page";
+import { User } from "../models/user";
+import { getPagesByUserAndGame } from "../repos/page-repo";
 import { Structure } from "src/interfaces/Structure";
 import { createElementsFromStructure, updateElementsFromStructure, deleteElementsFromStructure } from '../services/element-service';
 import { getSlug, sanitizeText, validate, sanitizeSlug } from "../services/base-service";
 
-export async function createPage(name: string, game_slug: string, structure: Structure) {
+export async function createPage(name: string, game_slug: string, is_private: boolean, user: User, structure: Structure) {
     const game: any = await Game.findOne({
         where: {
             slug: game_slug
@@ -13,32 +15,35 @@ export async function createPage(name: string, game_slug: string, structure: Str
 
     name = sanitizeText(name);
 
-    if (!validate(name)) throw new Error("The name exceeds the limit of 15 characters."); 
+    if (!validate(name)) throw new Error("The name exceeds the limit of 30 characters."); 
 
     let slug: string = getSlug(name);
-    structure = sanitizeStructure(structure, true);
+    structure = sanitizeStructure(structure);
 
     let page = await Page.create({
         name: name,
         slug: slug,
+        is_private: is_private,
         structure: structure,
-        game_id: game.id
+        game_id: game.id,
+        created_by: user.id
     });
 
     return page;
 }
 
-export async function updatePage(page: Page, name: string, structure: Structure) {
+export async function updatePage(page: Page, name: string, is_private: boolean, structure: Structure) {
     name = sanitizeText(name);
 
-    if (!validate(name)) throw new Error("The name exceeds the limit of 15 characters.");
+    if (!validate(name)) throw new Error("The name exceeds the limit of 30 characters.");
     
-    structure = sanitizeStructure(structure, false);
+    structure = sanitizeStructure(structure);
 
-    if (!validateStructure(structure)) throw new Error("There is at least one element's name that exceeds the limit of 15 characters.");
+    if (!validateStructure(structure)) throw new Error("There is at least one element's name that exceeds the limit of 30 characters.");
 
     page.update({
         name: name,
+        is_private: is_private,
         structure: structure
     });
 
@@ -49,8 +54,8 @@ export async function updatePage(page: Page, name: string, structure: Structure)
     return page;
 }
 
-export function getPages() {
-    return Page.findAll();
+export async function getPages(user: User, game: Game) {
+    return await getPagesByUserAndGame(user, game);
 }
 
 export function deletePage(page_id: number) {
@@ -61,7 +66,7 @@ export function deletePage(page_id: number) {
     });
 }
 
-function sanitizeStructure(structure: Structure, is_create: boolean) {
+function sanitizeStructure(structure: Structure) {
     for (let r = 0; r < structure.rows.length; r++) {
         for (let c = 0; c < structure.rows[r].cols.length; c++) {
             for (let e = 0; e < structure.rows[r].cols[c].elements.length; e++) {
@@ -84,7 +89,7 @@ function validateStructure(structure: Structure) {
         for (let c = 0; c < structure.rows[r].cols.length; c++) {
             for (let e = 0; e < structure.rows[r].cols[c].elements.length; e++) {
                 let element_name = structure.rows[r].cols[c].elements[e].name;
-                if (element_name.length > 15) return false;
+                if (element_name.length > 30) return false;
             }
         }
     }
