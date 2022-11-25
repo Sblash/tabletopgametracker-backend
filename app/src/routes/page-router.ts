@@ -6,10 +6,21 @@ import { getPageById, getPageBySlug } from "../repos/page-repo";
 import { Page } from '@models/page';
 import { Structure } from 'src/interfaces/Structure';
 import { getJwtTokenFromRequest, getUserFromJwt } from '../services/user-service';
+import { EventEmitter } from 'stream';
+import { User } from '@models/user';
+import { logPage } from '../services/log-service';
 
 // Constants
 export const pageRouter = Router();
 const { CREATED, OK, BAD_REQUEST } = StatusCodes;
+const CREATE_PAGE = "create";
+const UPDATE_PAGE = "update";
+
+let eventsEmitter = new EventEmitter.EventEmitter();
+
+eventsEmitter.on('log_page', (user: User, entity: Page, action: string) => {
+    logPage(user, entity, action);
+});
 
 // Paths
 const p = {
@@ -62,6 +73,10 @@ pageRouter.post(p.create, async (_: Request, res: Response) => {
     if (user) {
         try {
             const page = await createPage(name, game_slug, is_private, user, structure);
+
+            //fire event create group
+            eventsEmitter.emit('log_page', user, page, CREATE_PAGE);
+
             return res.status(CREATED).json({ success: true, page: page })
         } catch(e) {
             return res.status(OK).json({success: false, message: e.name});
@@ -86,8 +101,16 @@ pageRouter.put(p.update, async (_: Request, res: Response) => {
         })
     }
 
+    const token = getJwtTokenFromRequest(_);
+    if (!token) return res.status(401).json({"error": true, "message": 'Unauthorized access.'});
+    let user = await getUserFromJwt(token);
+
     try {
         page = await updatePage(page, name, is_private, structure);
+        
+        //fire event create group
+        eventsEmitter.emit('log_page', user, page, UPDATE_PAGE);
+
         return res.status(OK).json({ success: true, page: page })
     } catch(e) {
         return res.status(OK).json({success: false, message: e.message});

@@ -4,10 +4,22 @@ import { createGame, updateGame, deleteGame } from "../services/game-service";
 import { getGroupBySlug } from "../services/group-service";
 import { getGameById, getGameBySlug } from "../repos/game-repo";
 import { Game } from '../models/game';
+import { getJwtTokenFromRequest, getUserFromJwt } from '../services/user-service';
+import { EventEmitter } from 'stream';
+import { User } from '@models/user';
+import { logGame } from '../services/log-service';
 
 // Constants
 export const gameRouter = Router();
 const { CREATED, OK, BAD_REQUEST } = StatusCodes;
+const CREATE_GAME = "create";
+const UPDATE_GAME = "update";
+
+let eventsEmitter = new EventEmitter.EventEmitter();
+
+eventsEmitter.on('log_game', (user: User, entity: Game, action: string) => {
+    logGame(user, entity, action);
+});
 
 // Paths
 const p = {
@@ -52,8 +64,16 @@ gameRouter.post(p.create, async (_: Request, res: Response) => {
     if (!name) return res.status(OK).json({success: false, message: "Parameter 'name' can't be null."});
     if (!group_slug) return res.status(OK).json({success: false, message: "Parameter 'group_slug' can't be null."});
 
+    const token = getJwtTokenFromRequest(_);
+    if (!token) return res.status(401).json({"error": true, "message": 'Unauthorized access.'});
+    let user = await getUserFromJwt(token);
+
     try {
         const game = await createGame(name, group_slug);
+
+        //fire event create group
+        eventsEmitter.emit('log_game', user, game, CREATE_GAME);
+
         return res.status(CREATED).json({ success: true, game: game })
     } catch (e) {
         return res.status(OK).json({success: false, message: e.message});
@@ -77,8 +97,16 @@ gameRouter.put(p.update, async (_: Request, res: Response) => {
         })
     }
 
+    const token = getJwtTokenFromRequest(_);
+    if (!token) return res.status(401).json({"error": true, "message": 'Unauthorized access.'});
+    let user = await getUserFromJwt(token);
+
     try {
         game = await updateGame(game, name, profile_pic);
+
+        //fire event create group
+        eventsEmitter.emit('log_game', user, game, UPDATE_GAME);
+
         return res.status(OK).json({ success: true, game: game })
     } catch (e) {
         return res.status(OK).json({success: false, message: e.message});

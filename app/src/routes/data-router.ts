@@ -3,10 +3,22 @@ import { Request, Response, Router } from 'express';
 import { createData, updateData, deleteData } from "../services/data-service";
 import { getDataById } from "../repos/data-repo";
 import { Data } from '@models/data';
+import { getJwtTokenFromRequest, getUserFromJwt } from '../services/user-service';
+import { EventEmitter } from 'stream';
+import { User } from '@models/user';
+import { logData } from '../services/log-service';
 
 // Constants
 export const dataRouter = Router();
 const { CREATED, OK, BAD_REQUEST } = StatusCodes;
+const CREATE_DATA = "create";
+const UPDATE_DATA = "update";
+
+let eventsEmitter = new EventEmitter.EventEmitter();
+
+eventsEmitter.on('log_data', (user: User, entity: Data, action: string) => {
+    logData(user, entity, action);
+});
 
 // Paths
 const p = {
@@ -21,6 +33,13 @@ dataRouter.post(p.create, async (_: Request, res: Response) => {
     const element_slug: string = _.body.element_slug;
 
     const data = await createData(value, element_slug);
+    
+    const token = getJwtTokenFromRequest(_);
+    if (!token) return res.status(401).json({"error": true, "message": 'Unauthorized access.'});
+    let user = await getUserFromJwt(token);
+
+    eventsEmitter.emit('log_data', user, data, CREATE_DATA);
+
     return res.status(CREATED).json({ success: true, data: data })
 });
 
@@ -38,6 +57,13 @@ dataRouter.put(p.update, async (_: Request, res: Response) => {
     }
 
     data = await updateData(data, value);
+
+    const token = getJwtTokenFromRequest(_);
+    if (!token) return res.status(401).json({"error": true, "message": 'Unauthorized access.'});
+    let user = await getUserFromJwt(token);
+
+    eventsEmitter.emit('log_data', user, data, UPDATE_DATA);
+
     return res.status(OK).json({ success: true, data: data })
 });
 

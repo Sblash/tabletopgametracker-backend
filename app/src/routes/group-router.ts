@@ -5,10 +5,21 @@ import { getGroupById, getGroupBySlug } from "../repos/group-repo";
 import { Group } from '../models/group';
 import { getJwtTokenFromRequest, getUserFromJwt } from '../services/user-service';
 import { User as UserInterface } from '../interfaces/User';
+import { EventEmitter } from 'stream';
+import { User } from '@models/user';
+import { logGroup } from '../services/log-service';
 
 // Constants
 export const groupRouter = Router();
 const { CREATED, OK, BAD_REQUEST } = StatusCodes;
+const CREATE_GROUP = "create";
+const UPDATE_GROUP = "update";
+
+let eventsEmitter = new EventEmitter.EventEmitter();
+
+eventsEmitter.on('log_group', (user: User, group: Group, action: string) => {
+    logGroup(user, group, action);
+});
 
 // Paths
 const p = {
@@ -61,6 +72,9 @@ groupRouter.post(p.create, async (_: Request, res: Response) => {
     if (user) {
         try {
             let group = await createGroup(name, user, profile_pic);
+
+            //fire event create group
+            eventsEmitter.emit('log_group', user, group, CREATE_GROUP);
         
             await addMembers(group, members);
 
@@ -91,8 +105,15 @@ groupRouter.put(p.update, async (_: Request, res: Response) => {
         })
     }
 
+    const token = getJwtTokenFromRequest(_);
+    if (!token) return res.status(401).json({"error": true, "message": 'Unauthorized access.'});
+    let user = await getUserFromJwt(token);
+
     try {
         group = await updateGroup(group, name, profile_pic);
+
+        //fire event create group
+        eventsEmitter.emit('log_group', user, group, UPDATE_GROUP);
 
         if (members) {
             await updateMembers(group, members);

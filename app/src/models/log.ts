@@ -1,4 +1,4 @@
-import { DataType, Model, Table, Column, CreatedAt, ForeignKey } from "sequelize-typescript";
+import { DataType, Model, Table, Column, CreatedAt, ForeignKey, UpdatedAt } from "sequelize-typescript";
 import { User } from './user';
 import { Group } from './group';
 import { Game } from './game';
@@ -71,4 +71,11 @@ export class Log extends Model {
         allowNull: true
     })
     created_at!: Date;
+
+    @UpdatedAt
+    @Column({
+        type: DataType.DATE,
+        allowNull: true
+    })
+    updated_at!: Date;
 }
